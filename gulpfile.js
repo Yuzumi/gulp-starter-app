@@ -15,38 +15,43 @@ const gulp          = require('gulp')
     , browserSync   = require('browser-sync').create()
     , reload        = browserSync.reload;
 
+const dirs = {
+    dist    : './dist',
+    src     : './src'
+};
+
 const paths = {
     dist    : {
-        images  : './dist/images',
-        fonts   : './dist/fonts',
-        html    : './dist/',
-        css     : './dist/css',
-        js      : './dist/js'
+        images  : `${dirs.dist}/images`,
+        fonts   : `${dirs.dist}/fonts`,
+        html    : `${dirs.dist}/`,
+        css     : `${dirs.dist}/css`,
+        js      : `${dirs.dist}/js`
     },
     src     : {
-        images  : './src/images/*.*',
-        fonts   : './src/fonts/*.*',
-        html    : './src/*.html',
+        images  : `${dirs.src}/images/*.*`,
+        fonts   : `${dirs.src}/fonts/*.*`,
+        html    : `${dirs.src}/*.html`,
         less    : {
-            root: './src/less',
-            file: './src/less/*.less'
+            root: `${dirs.src}/less`,
+            file: `${dirs.src}/less/*.less`
         },
         scss    : {
-            root: './src/scss',
-            file: './src/scss/*.scss'
+            root: `${dirs.src}/scss`,
+            file: `${dirs.src}/scss/*.scss`
         },
         css     : {
-            root: './src/css',
-            file: './src/css/*.css',
-            min : '!./src/css/*.min.css'
+            root: `${dirs.src}/css`,
+            file: `${dirs.src}/css/*.css`,
+            min : `!${dirs.src}/css/*.min.css`
         },    
         js      : {
-            root: './src/js',
-            file: './src/js/*.js',
-            min : '!./src/js/*.min.js'
+            root: `${dirs.src}/js`,
+            file: `${dirs.src}/js/*.js`,
+            min : `!${dirs.src}/js/*.min.js`
         }
     },
-    clean   : './dist'
+    clean   : dirs.dist
 };
 
 /**
@@ -54,7 +59,7 @@ const paths = {
  */
 const config = {
     server: {
-        baseDir: './src'
+        baseDir: dirs.src
     },
     notify: false
 };
@@ -62,15 +67,14 @@ const config = {
 /**
  * Configure the browserSync task
  */
-gulp.task('browserSync', () => {
-    browserSync.init(config);
-});
+gulp.task('browserSync', () => browserSync.init(config));
 
 /**
  * Copy HTML
  */
 gulp.task('html:copy', () => {
-    return gulp.src(paths.src.html)
+    return gulp
+        .src(paths.src.html)
         .pipe(gulp.dest(paths.dist.html));
 });
 
@@ -78,21 +82,30 @@ gulp.task('html:copy', () => {
  * Compile Less
  */
 gulp.task('less:compile', () => {
-    return gulp.src(paths.src.less.file)
+    return gulp
+        .src(paths.src.less.file)
         .pipe(sourcemaps.init())
         .pipe(less())
             .on('error', util.log)
-        .pipe(prefixer([ 'last 5 versions' ]))
+        .pipe(prefixer([ 
+            'last 5 versions' 
+        ]))
         .pipe(sourcemaps.write())
         .pipe(gulp.dest(paths.src.css.root))
-        .pipe(reload({ stream: true }));
+        .pipe(reload({ 
+            stream: true 
+        }));
 });
 
 /**
  * Minify compiled CSS
  */
 gulp.task('css:minify', ['less:compile'], () => {
-    return gulp.src([ paths.src.css.file, paths.src.css.min ])
+    return gulp
+        .src([ 
+            paths.src.css.file, 
+            paths.src.css.min 
+        ])
         .pipe(cleanCSS({
             compatibility: 'ie8'
         }))
@@ -109,7 +122,8 @@ gulp.task('css:minify', ['less:compile'], () => {
  * Copy CSS
  */
 gulp.task('css:copy', ['css:minify'], () => {
-    return gulp.src(paths.src.css.file)
+    return gulp
+        .src(paths.src.css.file)
         .pipe(gulp.dest(paths.dist.css))
 });
 
@@ -117,7 +131,11 @@ gulp.task('css:copy', ['css:minify'], () => {
  * Minify JS
  */
 gulp.task('js:minify', () => {
-    return gulp.src([ paths.src.js.file, paths.src.js.min ])
+    return gulp
+        .src([ 
+            paths.src.js.file, 
+            paths.src.js.min 
+        ])
         .pipe(sourcemaps.init())
         .pipe(uglifyES())
             .on('error', util.log)
@@ -135,7 +153,8 @@ gulp.task('js:minify', () => {
  * Copy JS
  */
 gulp.task('js:copy', ['js:minify'], () => {
-    return gulp.src(paths.src.js.file)
+    return gulp
+        .src(paths.src.js.file)
         .pipe(gulp.dest(paths.dist.js));
 });
 
@@ -143,7 +162,8 @@ gulp.task('js:copy', ['js:minify'], () => {
  * Copy Fonts
  */
 gulp.task('fonts:copy', () => {
-    return gulp.src(paths.src.fonts)
+    return gulp
+        .src(paths.src.fonts)
         .pipe(gulp.dest(paths.dist.fonts));
 });
 
@@ -151,7 +171,8 @@ gulp.task('fonts:copy', () => {
  * Optimize images
  */
 gulp.task('images:optimize', () => {
-    return gulp.src(paths.src.images)
+    return gulp
+        .src(paths.src.images)
         .pipe(cache(imagemin({
             interlaced: true,
             progressive: true,
