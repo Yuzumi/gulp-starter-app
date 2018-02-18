@@ -6,6 +6,7 @@ const gulp          = require('gulp')
     , uglifyES      = require('gulp-uglify-es').default
     , sourcemaps    = require('gulp-sourcemaps')
     , prefixer      = require('gulp-autoprefixer')
+    , babel         = require('gulp-babel')
     , del           = require('del')
     , cleanCSS      = require('gulp-clean-css')
     , rename        = require('gulp-rename')
@@ -137,6 +138,9 @@ gulp.task('js:minify', () => {
             paths.src.js.min 
         ])
         .pipe(sourcemaps.init())
+        .pipe(babel({
+            presets: ['env']
+        }))
         .pipe(uglifyES())
             .on('error', util.log)
         .pipe(sourcemaps.write())
